@@ -19,7 +19,7 @@ const GroupButton =[{
 },{
     id: 4,
     icon: 'Host',
-    title: 'Screen share'
+    title: 'Sharing'
 }
 
 ]
@@ -53,20 +53,21 @@ const HomeButton = () => {
     buttonContainer: {
       flex: 1,
       alignItems: 'center',
-      marginHorizontal: 5, // Adjust spacing between buttons
+     
     },
     button: {
-      width: 60,
-      height: 60,
+      width: 50,
+      height: 50,
       borderRadius: 15,
       justifyContent: 'center',
-      backgroundColor: 'blue', // Changed for better visibility
+      backgroundColor: 'blue',
       alignItems: 'center',
     },
     text: {
       color: '#f5f5f5',
-      fontSize: 16,
+      fontSize: 12,
       fontWeight: '600',
       paddingTop: 10,
+      alignItems: 'center',
     },
   });

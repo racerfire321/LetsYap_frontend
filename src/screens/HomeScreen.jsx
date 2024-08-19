@@ -3,6 +3,7 @@ import React from 'react'
 import Header from '../components/Header'
 import SearchBar from '../components/SearchBar'
 import HomeButton from '../components/HomeButton'
+import UserList from '../components/UserList'
 
 const HomeScreen = () => {
   return (
@@ -11,6 +12,7 @@ const HomeScreen = () => {
       <Header/>
       <SearchBar/>
       <HomeButton/>
+      <UserList/>
      </SafeAreaView>
      </View>
   )
