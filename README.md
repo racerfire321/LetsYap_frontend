@@ -1,79 +1,105 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Let's Yap! - Live Communication App for Android
 
-# Getting Started
+## Table of Contents
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## Project Overview
 
-## Step 1: Start the Metro Server
+**Let's Yap!** is a real-time communication platform designed to facilitate seamless video and audio communication between users. The app focuses on providing a high-quality calling experience with minimal latency, secure communication through end-to-end encryption, and a user-friendly interface.
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+## Features
 
-To start Metro, run the following command from the _root_ of your React Native project:
+- **High-Definition Video & Audio:** Clear and high-quality video and audio for optimal communication.
+- **Real-Time Communication:** Minimal latency for smooth interaction.
+- **Secure Calls:** End-to-end encryption to protect user privacy.
+- **User-Friendly Interface:** Simple, intuitive interface for easy navigation and use.
+- **Room Management:**
+  - Create and join video call rooms with unique IDs.
+  - Manage microphone and camera settings during calls.
+- **Responsive Design:** Compatible across various Android devices and screen sizes.
+- **User Profiles:** View and edit profile information, including profile picture and username.
+- **Push Notifications:** Receive notifications for user interactions.
+- **Theming:** Support for light and dark themes.
 
-```bash
-# using npm
-npm start
+## Installation
 
-# OR using Yarn
-yarn start
-```
+To get started with Let's Yap, follow these steps:
 
-## Step 2: Start your Application
+1. **Clone the repository:**
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+    ```bash
+    git clone https://git.bajratechnologies.com/Bitisha/letsyap.git
+    cd letsyap
+    ```
 
-### For Android
+2. **Install dependencies:**
 
-```bash
-# using npm
-npm run android
+    ```bash
+    npm install
+    ```
 
-# OR using Yarn
-yarn android
-```
+3. **Run the project:**
 
-### For iOS
+    - For Android:
+    
+      ```bash
+      npx react-native run-android
+      
 
-```bash
-# using npm
-npm run ios
+## Usage
 
-# OR using Yarn
-yarn ios
-```
+1. **Login/Registration:**
+   - Create an account or log in with your credentials.
+2. **Creating a Room:**
+   - Start a new video call by creating a room with a unique ID.
+3. **Joining a Room:**
+   - Join an existing video call using the provided room ID.
+4. **In-Call Controls:**
+   - Toggle your microphone and camera on or off during the call.
+   - Switch between front and rear cameras.
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+## Contributing
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+Contributions are welcome! To contribute:
 
-## Step 3: Modifying your App
+1. **Fork the repository.**
+2. **Create a new branch** for your feature or bug fix:
 
-Now that you have successfully run the app, let's modify it.
+    ```bash
+    git checkout -b feature/your-feature-name
+    ```
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+3. **Commit your changes:**
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+    ```bash
+    git commit -m "feat: description of your feature"
+    ```
 
-## Congratulations! :tada:
+4. **Push to your branch:**
 
-You've successfully run and modified your React Native App. :partying_face:
+    ```bash
+    git push origin feature/your-feature-name
+    ```
 
-### Now what?
+5. **Create a Pull Request** on GitHub.
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
+## License
 
-# Troubleshooting
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+## Contact
 
-# Learn More
+If you have any questions or suggestions, feel free to reach out:
 
-To learn more about React Native, take a look at the following resources:
+- **Email:** bitisha.maharjan@bajratechnologies.com
+- **GitHub:** [bitisha](https://git.bajratechnologies.com/Bitisha)
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+---
+
+Thank you for using Let's Yap! We hope it makes your communication more seamless and enjoyable.
