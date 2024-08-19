@@ -22,8 +22,8 @@ export default HomeScreen
 
 const styles = StyleSheet.create({
   container:{
-    backgroundColor: '#1e1e1e',
-    padding: 20,
+    backgroundColor: '#1c1c1c',
+    padding: 15,
   },
   area:{
     height: '100%',
