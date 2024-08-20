@@ -1,13 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import HomeScreen from './src/screens/HomeScreen'
+import React from 'react';
+import AppNavigator from './src/navigation/Navigation';
 
 const App = () => {
-  return (
-    <HomeScreen/>
-  )
-}
+  return <AppNavigator />;
+};
 
-export default App
-
-const styles = StyleSheet.create({})
+export default App;
