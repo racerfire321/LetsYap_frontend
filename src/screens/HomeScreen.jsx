@@ -1,9 +1,9 @@
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import Header from '../components/Header'
-import SearchBar from '../components/SearchBar'
-import HomeButton from '../components/HomeButton'
-import UserList from '../components/UserList'
+import Header from '../components/Home/Header'
+import SearchBar from '../components/Home/SearchBar'
+import HomeButton from '../components/Home/HomeButton'
+import UserList from '../components/Home/UserList'
 
 const HomeScreen = () => {
   return (
