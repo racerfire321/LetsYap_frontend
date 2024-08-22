@@ -19,12 +19,6 @@ const Tab = createBottomTabNavigator();
 // HomeStack Navigator
 const HomeStack = () => (
   <Stack.Navigator
-    screenOptions={{
-      headerStyle: {
-        backgroundColor: '#1c1c1c',
-      },
-      headerTintColor: '#fff',
-    }}
     initialRouteName="Home"
   >
     <Stack.Screen
@@ -82,10 +76,10 @@ const AppNavigator = ({ isLoggedIn }) => {
               return <Ionicons name={iconName} size={size} color={color} />;
             },
             tabBarStyle: {
-              backgroundColor: '#1c1c1c',
+              backgroundColor: '#ffffff',
             },
-            tabBarActiveTintColor: '#fff',
-            tabBarInactiveTintColor: '#ccc',
+            tabBarActiveTintColor: '#1E3A8A',
+            tabBarInactiveTintColor: 'black',
           })}
         >
           <Tab.Screen
