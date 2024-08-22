@@ -16,13 +16,14 @@ const RegisterScreen = ({ navigation }) => {
       <Text style={styles.title}>Register for App</Text>
 
       <View style={styles.nameContainer}>
+
         <TextInput
           label="First Name"
           value={firstName}
           onChangeText={setFirstName}
           mode="outlined"
           style={[styles.input, styles.halfInput]}
-          left={<TextInput.Icon name="account" />}
+          left={<TextInput.Icon name="account" size={20} color={'#000'} />}
         />
         <TextInput
           label="Last Name"
@@ -94,6 +95,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 30,
+    color: 'black'
   },
   nameContainer: {
     flexDirection: 'row',
@@ -108,12 +110,12 @@ const styles = StyleSheet.create({
   },
   button: {
     marginVertical: 10,
-    backgroundColor: '#00796b',
+    backgroundColor: '#1E3A8A',
   },
   loginText: {
     marginTop: 20,
     textAlign: 'center',
-    color: '#00796b',
+    color: '#FF6F61',
   },
 });
 
