@@ -27,7 +27,7 @@ const users = [
 const UserList = () => {
   return (
     <View style={styles.container}>
-        <Text>Users</Text>
+        <Text style={styles.text}>Users</Text>
       <FlatList
         data={users}
         keyExtractor={(item) => item.id.toString()}
@@ -52,6 +52,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
   },
+  text:{
+    color:'#FF6F61',
+    fontWeight: '700',
+    fontSize: 18
+  },
   userRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -70,5 +75,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginLeft: 10,
+   color: 'black'
   },
 });

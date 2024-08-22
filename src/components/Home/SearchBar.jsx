@@ -1,11 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import Icon from 'react-native-ionicons'
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const SearchBar = () => {
   return (
     <View style={styles.container}>
-      <Icon name='search' size={20} color='#858585'></Icon>
+      <Ionicons name='search' size={20} color='#858585'/>
       <Text style={styles.searchText}>Search</Text>
     </View>
   )
@@ -21,10 +21,11 @@ const styles = StyleSheet.create({
         height: 40,
         alignItems:'center',
         borderRadius: 10,
+        marginTop: 10
     },
     searchText: {
         color: '#858585',
         paddingLeft: 10,
-        fontSize: 20,
+        fontSize: 16,
     },
 })
