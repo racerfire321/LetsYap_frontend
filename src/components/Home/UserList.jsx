@@ -5,29 +5,29 @@ const users = [
   {
     id: 1,
     name: 'Bitisha Maharjan',
-    imageUrl: require('../assets/user/bits.jpg'), 
+    imageUrl: require('../../assets/user/bits.jpg'), 
   },
   {
     id: 2,
     name: 'Prekshya Dali',
-    imageUrl: require('../assets/user/pre.jpg'),  
+    imageUrl: require('../../assets/user/pre.jpg'),  
   },
   {
     id: 3,
     name: 'Avantika Nepal',
-    imageUrl: require('../assets/user/av.jpg'),  
+    imageUrl: require('../../assets/user/av.jpg'),  
   },
   {
     id: 4,
     name: 'Lana del rey',
-    imageUrl: require('../assets/user/lana.jpg'), 
+    imageUrl: require('../../assets/user/lana.jpg'), 
   },
 ];
 
 const UserList = () => {
   return (
     <View style={styles.container}>
-        <Text>Users</Text>
+        <Text style={styles.text}>Users</Text>
       <FlatList
         data={users}
         keyExtractor={(item) => item.id.toString()}
@@ -52,6 +52,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
   },
+  text:{
+    color:'#FF6F61',
+    fontWeight: '700',
+    fontSize: 18
+  },
   userRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -70,5 +75,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginLeft: 10,
+   color: 'black'
   },
 });

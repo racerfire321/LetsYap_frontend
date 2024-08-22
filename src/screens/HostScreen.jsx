@@ -44,7 +44,7 @@ const HostScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1c1c1c',
+    backgroundColor: '#fff',
     padding: 20,
     justifyContent: 'center',
   },
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: '#333',
-    color: '#fff',
+    color: '##1E3A8A',
     padding: 15,
     borderRadius: 10,
     marginBottom: 20,
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   optionText: {
-    color: '#fff',
+    color: '#1E3A8A',
     fontSize: 16,
   },
   startButton: {
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   startButtonText: {
-    color: '#fff',
+    color: '#1E3A8A',
     fontSize: 18,
     marginLeft: 10,
   },
