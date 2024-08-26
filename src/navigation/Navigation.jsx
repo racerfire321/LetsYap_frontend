@@ -12,27 +12,27 @@ import CalendarScreen from '../screens/CalenderScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import MainScreen from '../screens/MainScreen';
+import CallScreen from '../screens/CallScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // HomeStack Navigator
 const HomeStack = () => (
-  <Stack.Navigator
-    initialRouteName="Home"
-  >
-    <Stack.Screen
-      name="Home"
-      component={HomeScreen}
-      options={{ headerShown: false }}
-    />
+  <Stack.Navigator initialRouteName="Home">
+    <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
     <Stack.Screen name="Host" component={HostScreen} />
     <Stack.Screen name="Join" component={JoinScreen} />
-    <Stack.Screen
-      name="Calendar"
-      component={CalendarScreen}
-      options={{ headerShown: false }}
+    <Stack.Screen 
+      name="Call" 
+      component={CallScreen} 
+      options={{ 
+        headerShown: false, 
+        tabBarStyle: { display: "none" },
+        
+      }} 
     />
+    <Stack.Screen name="Calendar" component={CalendarScreen} options={{ headerShown: false }} />
   </Stack.Navigator>
 );
 
@@ -47,13 +47,9 @@ const AuthStack = () => (
     }}
     initialRouteName="FrontPage"
   >
-    <Stack.Screen
-      name="FrontPage"
-      component={MainScreen}
-      options={{ headerShown: false }}
-    />
-    <Stack.Screen name="Login" component={LoginScreen}  options={{ headerShown: false }} />
-    <Stack.Screen name="Register" component={RegisterScreen}  options={{ headerShown: false }} />
+    <Stack.Screen name="FrontPage" component={MainScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
   </Stack.Navigator>
 );
 
@@ -82,16 +78,8 @@ const AppNavigator = ({ isLoggedIn }) => {
             tabBarInactiveTintColor: 'black',
           })}
         >
-          <Tab.Screen
-            name="Home"
-            component={HomeStack}
-            options={{ headerShown: false }}
-          />
-          <Tab.Screen
-            name="Settings"
-            component={SettingsScreen}
-            options={{ headerShown: false }}
-          />
+          <Tab.Screen name="Home" component={HomeStack} options={{ headerShown: false }} />
+          <Tab.Screen name="Settings" component={SettingsScreen} options={{ headerShown: false }} />
         </Tab.Navigator>
       ) : (
         <AuthStack />
