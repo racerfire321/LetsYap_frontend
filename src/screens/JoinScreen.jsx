@@ -1,17 +1,38 @@
 import React, { useState } from 'react';
 import { View, Text, Switch, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useNavigation } from '@react-navigation/native';
+import io from 'socket.io-client';
+import { SOCKET_URL } from '../utils/config/config';
+
+const socket = io(SOCKET_URL);
 
 const JoinScreen = () => {
-  const [meetingID, setMeetingID] = useState('');
-  const [displayName, setDisplayName] = useState('');
+  const [username, setUsername] = useState('');
+  const [roomId, setRoomId] = useState('');
   const [isAudioOff, setIsAudioOff] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
+ const navigation = useNavigation();
+  
 
-  const handleJoinMeeting = () => {
-    // Logic to join the meeting
-    console.log('Joining Meeting with ID:', meetingID, 'as', displayName);
-  };
+ const handleJoinMeeting = () => {
+  if (username.trim() !== '' && roomId.trim() !== '') {
+    console.log('Joining room...');
+   
+    socket.emit('join-room', { roomId, username }, (response) => {
+      console.log('Server response:', response);
+      
+
+      if (response.success) {
+        navigation.navigate('Call', { roomId, username, isAudioOff, isVideoOff });
+      } else {
+        alert('Room not found!');
+      }
+    });
+  } else {
+    alert('Please enter a username and room ID');
+  }
+};
 
   return (
     <View style={styles.container}>
@@ -19,17 +40,17 @@ const JoinScreen = () => {
 
       <TextInput
         style={styles.input}
-        placeholder="Meeting ID"
-        value={meetingID}
-        onChangeText={setMeetingID}
-        keyboardType="numeric"
+        placeholder="Room ID"
+        value={roomId}
+        onChangeText={setRoomId}
+       
       />
 
       <TextInput
         style={styles.input}
         placeholder="Your Name"
-        value={displayName}
-        onChangeText={setDisplayName}
+        value={username}
+        onChangeText={setUsername}
       />
 
       <View style={styles.option}>
@@ -38,7 +59,7 @@ const JoinScreen = () => {
       </View>
 
       <View style={styles.option}>
-        <Text style={styles.optionText}>Turn Off My Video</Text>
+        <Text style={styles.optionText}>Turn off My Video</Text>
         <Switch value={isVideoOff} onValueChange={setIsVideoOff} />
       </View>
 
