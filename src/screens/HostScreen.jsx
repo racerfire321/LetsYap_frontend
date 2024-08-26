@@ -1,16 +1,36 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { View, Text, Switch, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import io from 'socket.io-client';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { SOCKET_URL } from '../utils/config/config';
+
+const socket = io(SOCKET_URL);
 
 const HostScreen = () => {
-  const [isMuted, setIsMuted] = useState(false);
+  const [username, setUsername] = useState('');
+  const [isAudioOff, setIsAudioOff] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
-  const [meetingID, setMeetingID] = useState('');
+  const navigation = useNavigation()
+;
 
-  const handleStartMeeting = () => {
-    // Logic to start the meeting
-    console.log('Meeting Started with ID:', meetingID);
-  };
+  
+const handleStartMeeting = () => {
+  if (username.trim() !== '') {
+    console.log(isVideoOff)
+    // Emit the create-room event with the username
+    socket.emit('create-room', username);
+    socket.once('room-created', ({ roomId }) => {
+        console.log('Received roomId from server:', roomId);
+        socket.emit('join-room', { roomId, username });
+        navigation.navigate('Call', { roomId, username ,isAudioOff,isVideoOff });
+    });
+
+  } else {
+    alert('Please enter a username');
+  }
+};
+
 
   return (
     <View style={styles.container}>
@@ -18,14 +38,14 @@ const HostScreen = () => {
 
       <TextInput
         style={styles.input}
-        placeholder="Enter Meeting ID"
-        value={meetingID}
-        onChangeText={setMeetingID}
+        placeholder="Enter username"
+        value={username}
+        onChangeText={setUsername}
       />
 
       <View style={styles.option}>
         <Text style={styles.optionText}>Mute on Entry</Text>
-        <Switch value={isMuted} onValueChange={setIsMuted} />
+        <Switch value={isAudioOff} onValueChange={setIsAudioOff} />
       </View>
 
       <View style={styles.option}>
@@ -37,6 +57,7 @@ const HostScreen = () => {
         <Icon name="videocam" size={24} color="#fff" />
         <Text style={styles.startButtonText}>Start Session</Text>
       </TouchableOpacity>
+
     </View>
   );
 };
