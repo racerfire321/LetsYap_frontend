@@ -12,7 +12,20 @@
           "package_name": "com.letsyap"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "314244381974-g8u9n9a43a22c1ub6mtf27d4tfml2j21.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.letsyap",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "314244381974-m51hluj0a24jgiio7f7gj4vjbib6979j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBY2riyf5TT2kkr3P7UgQlRYdJ_-7VpUiw"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "314244381974-m51hluj0a24jgiio7f7gj4vjbib6979j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
