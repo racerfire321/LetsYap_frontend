@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text, Switch, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import io from 'socket.io-client';
 import { SOCKET_URL } from '../utils/config/config';
-
+import { ThemeContext } from '../contexts/theme/ThemeProvider'; 
+import { Colors } from '../constants/constants';
 const socket = io(SOCKET_URL);
 
 const JoinScreen = () => {
@@ -12,60 +13,64 @@ const JoinScreen = () => {
   const [roomId, setRoomId] = useState('');
   const [isAudioOff, setIsAudioOff] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
- const navigation = useNavigation();
-  
+  const navigation = useNavigation();
+  const { isDarkTheme } = useContext(ThemeContext);
+  const currentColors = isDarkTheme ? Colors.dark : Colors.light; 
 
- const handleJoinMeeting = () => {
-  if (username.trim() !== '' && roomId.trim() !== '') {
-    console.log('Joining room...');
-   
-    socket.emit('join-room', { roomId, username }, (response) => {
-      console.log('Server response:', response);
+  const handleJoinMeeting = () => {
+    if (username.trim() !== '' && roomId.trim() !== '') {
+      console.log('Joining room...');
       
-
-      if (response.success) {
-        navigation.navigate('Call', { roomId, username, isAudioOff, isVideoOff });
-      } else {
-        alert('Room not found!');
-      }
-    });
-  } else {
-    alert('Please enter a username and room ID');
-  }
-};
+      socket.emit('join-room', { roomId, username }, (response) => {
+        console.log('Server response:', response);
+        
+        if (response.success) {
+          navigation.navigate('Call', { roomId, username, isAudioOff, isVideoOff });
+        } else {
+          alert('Room not found!');
+        }
+      });
+    } else {
+      alert('Please enter a username and room ID');
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Join a Session</Text>
+    <View style={[styles.container, { backgroundColor: currentColors.background }]}>
+      <Text style={[styles.title, { color: currentColors.secondary }]}>Join a Session</Text>
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, { backgroundColor: currentColors.box, color: currentColors.text }]}
         placeholder="Room ID"
+        placeholderTextColor={currentColors.text}
         value={roomId}
         onChangeText={setRoomId}
-       
       />
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, { backgroundColor: currentColors.box, color: currentColors.text }]}
         placeholder="Your Name"
+        placeholderTextColor={currentColors.text}
         value={username}
         onChangeText={setUsername}
       />
 
       <View style={styles.option}>
-        <Text style={styles.optionText}>Don't Connect to Audio</Text>
+        <Text style={[styles.optionText, { color: currentColors.text }]}>Don't Connect to Audio</Text>
         <Switch value={isAudioOff} onValueChange={setIsAudioOff} />
       </View>
 
       <View style={styles.option}>
-        <Text style={styles.optionText}>Turn off My Video</Text>
+        <Text style={[styles.optionText, { color: currentColors.text }]}>Turn off My Video</Text>
         <Switch value={isVideoOff} onValueChange={setIsVideoOff} />
       </View>
 
-      <TouchableOpacity style={styles.joinButton} onPress={handleJoinMeeting}>
-        <Icon name="meeting-room" size={24} color="#fff" />
-        <Text style={styles.joinButtonText}>Join Meeting</Text>
+      <TouchableOpacity
+        style={[styles.joinButton]}
+        onPress={handleJoinMeeting}
+      >
+        <Icon name="meeting-room" size={24} color={currentColors.buttonText} />
+        <Text style={[styles.joinButtonText, { color: currentColors.buttonText }]}>Join Meeting</Text>
       </TouchableOpacity>
     </View>
   );
@@ -74,24 +79,21 @@ const JoinScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1c1c1c',
     padding: 20,
     justifyContent: 'center',
   },
   title: {
     fontSize: 24,
-    color: '#fff',
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 29,
   },
   input: {
-    backgroundColor: '#333',
-    color: '#fff',
     padding: 15,
     borderRadius: 10,
-    marginBottom: 20,
+    marginBottom: 24,
     fontSize: 16,
+    elevation: 5,
   },
   option: {
     flexDirection: 'row',
@@ -100,23 +102,23 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   optionText: {
-    color: '#fff',
     fontSize: 16,
   },
   joinButton: {
-    flexDirection: 'row',
-    backgroundColor: '#007bff',
-    padding: 15,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 30,
-  },
-  joinButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    marginLeft: 10,
-  },
+        flexDirection: 'row',
+        backgroundColor: Colors.light.primary,
+        padding: 15,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 30,
+        elevation: 6
+      },
+      joinButtonText: {
+        color: '#fff',
+        fontSize: 18,
+        marginLeft: 10,
+      },
 });
 
 export default JoinScreen;
