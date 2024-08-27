@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   registerText: {
-    color: '#FF6F61', 
+    color: '#ff6347', 
     fontSize: 16,
     top: 15,
   },
