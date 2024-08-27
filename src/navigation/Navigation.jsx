@@ -18,7 +18,7 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // HomeStack Navigator
-const HomeStack = () => (
+export const HomeStack = () => (
   <Stack.Navigator initialRouteName="Home">
     <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
     <Stack.Screen name="Host" component={HostScreen} />
@@ -37,7 +37,7 @@ const HomeStack = () => (
 );
 
 // AuthStack Navigator for Login, Register, and FrontPage
-const AuthStack = () => (
+export const AuthStack = () => (
   <Stack.Navigator
     screenOptions={{
       headerStyle: {
@@ -54,10 +54,10 @@ const AuthStack = () => (
 );
 
 // Main App Navigator with Tabs
-const AppNavigator = ({ isLoggedIn }) => {
+export const AppNavigator = () => {
   return (
-    <NavigationContainer>
-      {isLoggedIn ? (
+   <>
+     
         <Tab.Navigator
           screenOptions={({ route }) => ({
             tabBarIcon: ({ focused, color, size }) => {
@@ -81,10 +81,7 @@ const AppNavigator = ({ isLoggedIn }) => {
           <Tab.Screen name="Home" component={HomeStack} options={{ headerShown: false }} />
           <Tab.Screen name="Settings" component={SettingsScreen} options={{ headerShown: false }} />
         </Tab.Navigator>
-      ) : (
-        <AuthStack />
-      )}
-    </NavigationContainer>
+    </>
   );
 };
 
