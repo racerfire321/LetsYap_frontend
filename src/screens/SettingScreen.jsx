@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { StyleSheet, Text, View, Switch, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Slider from '@react-native-community/slider';
 import Ionicons from 'react-native-vector-icons/Ionicons'; 
-
+import { AuthContext } from '../contexts/auth/AuthProvider';
 
 const SettingsScreen = () => {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
@@ -11,9 +11,11 @@ const SettingsScreen = () => {
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true);
   const [volume, setVolume] = useState(50);
 
+  const {logout} = useContext(AuthContext);
+
   const toggleThemeSwitch = () => setIsDarkTheme(previousState => !previousState);
   const toggleNotificationsSwitch = () => setIsNotificationsEnabled(previousState => !previousState);
-
+  
   return (
     <ScrollView style={[styles.container, isDarkTheme && styles.darkContainer]}>
       <Text style={[styles.title, isDarkTheme && styles.darkTitle]}>Settings</Text>
@@ -90,7 +92,7 @@ const SettingsScreen = () => {
       </TouchableOpacity> */}
 
       {/* Logout Button */}
-      <TouchableOpacity style={[styles.logoutButton, isDarkTheme && styles.darkLogoutButton]}>
+      <TouchableOpacity style={[styles.logoutButton, isDarkTheme && styles.darkLogoutButton]} onPress={logout}>
         <Text style={[styles.logoutButtonText, isDarkTheme && styles.darkLogoutButtonText]}>Logout</Text>
       </TouchableOpacity>
 
