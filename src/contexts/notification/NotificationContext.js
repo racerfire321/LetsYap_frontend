@@ -131,20 +131,18 @@ export const NotificationProvider = ({ children }) => {
     console.log(`Preparing to send notification for event: ${eventName}`);
     try {
       await notifee.createChannel({
-        id: 'default',
-        name: 'Default Channel',
+        id: 'default', 
+  name: 'Default Channel',
+  sound: 'notification',
       });
 
       await notifee.displayNotification({
-        title: 'Event Reminder',
+        title: 'Are you ready for upcoming events?',
         body: `${eventName}`,
         android: {
-          channelId: 'default',
-          sound: 'default',
-        },
-        ios: {
-          sound: 'default',
-        },
+            channelId: 'default', 
+            sound: 'notification',
+        }
       });
 
       console.log(`Notification sent for event: ${eventName}`);
