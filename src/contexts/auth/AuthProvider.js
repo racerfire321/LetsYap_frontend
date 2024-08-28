@@ -1,11 +1,21 @@
-import React, {createContext, useState} from 'react';
+import React, {createContext, useState, useEffect} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = auth().onAuthStateChanged(async (authenticatedUser) => {
+      setUser(authenticatedUser);
+
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const login = async (email, password) => {
     try {
@@ -15,7 +25,7 @@ export const AuthProvider = ({children}) => {
     }
   };
 
-  const register = async (firstname,lastname,dob, email, password) => {
+  const register = async (firstname, lastname, dob, email, password) => {
     try {
       const userCredential = await auth().createUserWithEmailAndPassword(email, password);
       const { uid } = userCredential.user;
@@ -25,11 +35,11 @@ export const AuthProvider = ({children}) => {
         .collection('users')
         .doc(uid)
         .set({
-            firstname: firstname,
+          firstname: firstname,
           email: email,
           createdAt: firestore.Timestamp.fromDate(new Date()),
           lastname: lastname,
-          dob: dob
+          dob: dob,
         });
 
       console.log('User added to Firestore with UID:', uid);

@@ -6,12 +6,15 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import firestore from '@react-native-firebase/firestore';
 import { AuthContext } from '../contexts/auth/AuthProvider';
 import { ThemeContext } from '../contexts/theme/ThemeProvider';
+import { NotificationContext } from '../contexts/notification/NotificationContext';
 import { Colors } from '../constants/constants';
 
 const SettingsScreen = () => {
   const { isDarkTheme, toggleTheme } = useContext(ThemeContext);
+  const { isNotificationsEnabled, setIsNotificationsEnabled } = useContext(NotificationContext);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
-  const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true);
+
+
   const [volume, setVolume] = useState(50);
   const { logout, user } = useContext(AuthContext);
   const [userName, setUserName] = useState('');
@@ -148,7 +151,6 @@ const SettingsScreen = () => {
         />
       </View>
 
-      {/* Notification Settings */}
       <View style={[styles.setting, { backgroundColor: currentColors.box }]}>
         <Text style={[styles.settingText, { color: currentColors.text }]}>Notifications</Text>
         <Switch

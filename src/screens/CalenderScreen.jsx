@@ -1,123 +1,117 @@
-// import React, { useState } from 'react';
-// import { StyleSheet, View, Text } from 'react-native';
-// import { Agenda } from 'react-native-calendars';
-
-// const CalendarScreen = () => {
-//   const [selectedDate, setSelectedDate] = useState('');
-
-//   const items = {
-//     '2024-08-19': [{ name: 'Meeting with Team', height: 80 }],
-//     '2024-08-20': [{ name: 'Project Deadline', height: 80 }],
-//     '2024-08-22': [{ name: 'Doctor Appointment', height: 80 }],
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <Text style={styles.header}>Your Schedule</Text>
-//       <Agenda
-//         items={items}
-//         selected={selectedDate || '2024-08-19'}
-//         renderItem={(item) => (
-//           <View style={styles.item}>
-//             <Text style={styles.itemText}>{item.name}</Text>
-//           </View>
-//         )}
-//         renderEmptyDate={() => (
-//           <View style={styles.emptyDate}>
-//             <Text style={styles.emptyDateText}>No Events Today</Text>
-//           </View>
-//         )}
-//         onDayPress={(day) => {
-//           setSelectedDate(day.dateString);
-//         }}
-//         theme={{
-//           backgroundColor: '#1c1c1c',
-//           calendarBackground: '#1c1c1c',
-//           selectedDayBackgroundColor: '#3b5998',
-//           todayTextColor: '#3b5998',
-//           dayTextColor: '#ffffff',
-//           textDisabledColor: '#555555',
-//           dotColor: '#3b5998',
-//           selectedDotColor: '#ffffff',
-//           arrowColor: 'orange',
-//           monthTextColor: '#90caf9',
-//           textDayFontFamily: 'monospace',
-//           textMonthFontFamily: 'monospace',
-//           textDayHeaderFontFamily: 'monospace',
-//           textDayFontWeight: '300',
-//           textMonthFontWeight: 'bold',
-//           textDayHeaderFontWeight: '300',
-//           textDayFontSize: 16,
-//           textMonthFontSize: 16,
-//           textDayHeaderFontSize: 16,
-//         }}
-//       />
-//     </View>
-//   );
-// };
-
-// export default CalendarScreen;
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#1c1c1c',
-//   },
-//   header: {
-//     fontSize: 24,
-//     fontWeight: 'bold',
-//     padding: 16,
-//     backgroundColor: '#3b5998',
-//     color: '#ffffff',
-//     textAlign: 'center',
-//   },
-//   item: {
-//     backgroundColor: '#252525',
-//     padding: 20,
-//     marginRight: 10,
-//     marginTop: 17,
-//     borderRadius: 5,
-//     shadowColor: '#000',
-//     shadowOffset: { width: 0, height: 2 },
-//     shadowOpacity: 0.8,
-//     shadowRadius: 2,
-//     elevation: 1,
-//   },
-//   itemText: {
-//     color: '#ffffff',
-//   },
-//   emptyDate: {
-//     backgroundColor: '#252525',
-//     padding: 20,
-//     marginRight: 10,
-//     marginTop: 17,
-//     borderRadius: 5,
-//     shadowColor: '#000',
-//     shadowOffset: { width: 0, height: 2 },
-//     shadowOpacity: 0.8,
-//     shadowRadius: 2,
-//     elevation: 1,
-//   },
-//   emptyDateText: {
-//     color: '#ffffff',
-//   },
-// });
-
-
-import React, { useContext, useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import React, { useContext, useState, useEffect } from 'react'; 
+import { StyleSheet, View, Text, TouchableOpacity, TextInput, Modal, Button, Alert } from 'react-native';
 import { Agenda } from 'react-native-calendars';
-import { ThemeContext } from '../contexts/theme/ThemeProvider'; // Adjust import path if needed
+import firestore from '@react-native-firebase/firestore';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { ThemeContext } from '../contexts/theme/ThemeProvider';
+import { AuthContext } from '../contexts/auth/AuthProvider';
 import { Colors } from '../constants/constants';
+
 const CalendarScreen = () => {
   const [selectedDate, setSelectedDate] = useState('');
+  const [items, setItems] = useState({});
+  const [modalVisible, setModalVisible] = useState(false);
+  const [eventName, setEventName] = useState('');
+  const [eventId, setEventId] = useState(null);
   const { isDarkTheme } = useContext(ThemeContext);
-  const currentColors = isDarkTheme ? Colors.dark : Colors.light; // Adjust Colors import if needed
+  const { user } = useContext(AuthContext);
+  const currentColors = isDarkTheme ? Colors.dark : Colors.light;
 
-  const items = {
-    '2024-08-19': [{ name: 'Meeting with Team', height: 80 }],
-    '2024-08-20': [{ name: 'Project Deadline', height: 80 }],
-    '2024-08-22': [{ name: 'Doctor Appointment', height: 80 }],
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    setSelectedDate(today);
+
+    if (user) {
+      const unsubscribe = firestore()
+        .collection('user-events')
+        .where('userId', '==', user.uid)
+        .onSnapshot(querySnapshot => {
+          const events = {};
+          querySnapshot.forEach(doc => {
+            const data = doc.data();
+            const date = data.date;
+            if (!events[date]) {
+              events[date] = [];
+            }
+            events[date].push({
+              ...data,
+              id: doc.id,
+            });
+          });
+          setItems(events);
+        });
+
+      return () => unsubscribe();
+    }
+  }, [user]);
+
+  const handleAddEvent = async () => {
+    if (eventName.trim() === '') {
+      Alert.alert('Error', 'Event name cannot be empty');
+      return;
+    }
+
+    try {
+      if (eventId) {
+        await firestore()
+          .collection('user-events')
+          .doc(eventId)
+          .update({
+            name: eventName,
+            date: selectedDate,
+          });
+        console.log('Event updated');
+      } else {
+        await firestore()
+          .collection('user-events')
+          .add({
+            userId: user.uid,
+            name: eventName,
+            date: selectedDate,
+          });
+        console.log('Event added');
+      }
+
+      resetModal();
+    } catch (error) {
+      console.error('Error adding/updating event: ', error);
+    }
+  };
+
+  const handleDeleteEvent = async (id) => {
+    try {
+      await firestore()
+        .collection('user-events')
+        .doc(id)
+        .delete();
+      console.log('Event deleted');
+      // Update state to reflect deletion
+      setItems(prevItems => {
+        const updatedItems = { ...prevItems };
+        for (const date in updatedItems) {
+          updatedItems[date] = updatedItems[date].filter(item => item.id !== id);
+          if (updatedItems[date].length === 0) {
+            delete updatedItems[date];
+          }
+        }
+        return updatedItems;
+      });
+    } catch (error) {
+      console.error('Error deleting event: ', error);
+    }
+  };
+
+  const resetModal = () => {
+    setEventName('');
+    setEventId(null);
+    setModalVisible(false);
+  };
+
+  const openEditModal = (item) => {
+    setEventName(item.name);
+    setEventId(item.id);
+    setSelectedDate(item.date);
+    setModalVisible(true);
   };
 
   return (
@@ -127,30 +121,35 @@ const CalendarScreen = () => {
       </Text>
       <Agenda
         items={items}
-        selected={selectedDate || '2024-08-19'}
+        selected={selectedDate}
         renderItem={(item) => (
-          <View style={[styles.item, { backgroundColor: currentColors.background }]}>
-            <Text style={[styles.itemText, { color: currentColors.text
-             }]}>{item.name}</Text>
+          <View key={item.id} style={[styles.itemContainer, { backgroundColor: currentColors.box }]}>
+            <TouchableOpacity
+              style={[styles.item, { backgroundColor: currentColors.box }]}
+              onPress={() => openEditModal(item)}
+            >
+              <Text style={[styles.itemText, { color: currentColors.text }]}>{item.name}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleDeleteEvent(item.id)}>
+              <Icon name="delete" size={24} color={currentColors.text} />
+            </TouchableOpacity>
           </View>
         )}
         renderEmptyDate={() => (
-          <View style={[styles.emptyDate, { backgroundColor: currentColors.background }]}>
+          <View style={[styles.emptyDate, { backgroundColor: currentColors.box }]}>
             <Text style={[styles.emptyDateText, { color: currentColors.text }]}>No Events Today</Text>
           </View>
         )}
-        onDayPress={(day) => {
-          setSelectedDate(day.dateString);
-        }}
+        onDayPress={(day) => setSelectedDate(day.dateString)}
         theme={{
           backgroundColor: currentColors.background,
           calendarBackground: currentColors.background,
-          selectedDayBackgroundColor: currentColors.background,
+          selectedDayBackgroundColor: currentColors.primary,
           todayTextColor: currentColors.primary,
           dayTextColor: currentColors.text,
           textDisabledColor: currentColors.textDisabled,
-          dotColor: currentColors.dotColor,
-          selectedDotColor: currentColors.primary,
+          dotColor: currentColors.primary,
+          selectedDotColor: currentColors.text,
           arrowColor: currentColors.primary,
           monthTextColor: currentColors.primary,
           textDayFontFamily: 'monospace',
@@ -164,11 +163,36 @@ const CalendarScreen = () => {
           textDayHeaderFontSize: 16,
         }}
       />
+
+      <TouchableOpacity style={[styles.addButton, { backgroundColor: currentColors.primary }]} onPress={() => setModalVisible(true)}>
+        <Icon name="add-circle" size={44} color={currentColors.background} />
+      </TouchableOpacity>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={resetModal}
+      >
+        <View style={[styles.modalView, { backgroundColor: currentColors.background }]}>
+          <Text style={[styles.modalTitle, { color: currentColors.text }]}>Add/Edit Event</Text>
+          <TextInput
+            style={[styles.input, { backgroundColor: currentColors.inputBackground, color: currentColors.text }]}
+            placeholder="Event Name"
+            placeholderTextColor={currentColors.textDisabled}
+            value={eventName}
+            onChangeText={setEventName}
+          />
+          <Text style={{ color: currentColors.text }}>Selected Date: {selectedDate}</Text>
+          <View style={styles.modalButtons}>
+            <Button title="Cancel" onPress={resetModal} color={currentColors.secondary} />
+            <Button title="Save" onPress={handleAddEvent} color={currentColors.primary} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
-
-export default CalendarScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -180,34 +204,76 @@ const styles = StyleSheet.create({
     padding: 16,
     textAlign: 'center',
     color: 'white',
-    elevation: 3
-  },
-  item: {
-    padding: 20,
-    marginRight: 10,
-    marginTop: 17,
-    borderRadius: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
     elevation: 3,
   },
+  itemContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    marginBottom: 10,
+    borderRadius: 10,
+    margin: 15,
+    
+    elevation: 3,
+  },
+  item: {
+    flex: 1,
+    marginRight: 10,
+    // borderRadius: 10,
+    // padding: 10,
+    // elevation: 2,
+  },
   itemText: {
-    color: '#ffffff',
+    fontSize: 16,
   },
   emptyDate: {
     padding: 20,
-    marginRight: 10,
-    marginTop: 17,
-    borderRadius: 5,
+    borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 1,
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 2,
   },
   emptyDateText: {
-    color: '#ffffff',
+    fontSize: 16,
+  },
+  addButton: {
+    position: 'absolute',
+    right: 20,
+    bottom: 30,
+    zIndex: 1,
+    borderRadius: 28,
+  },
+  modalView: {
+    width: '80%',
+    maxHeight: '60%',
+    padding: 20,
+    borderRadius: 10,
+    elevation: 5,
+    alignSelf: 'center',
+    top: 190,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  input: {
+    width: '100%',
+    padding: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 20,
+  },
+  modalButtons: {
+    marginTop: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    
   },
 });
+
+export default CalendarScreen;
