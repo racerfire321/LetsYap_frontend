@@ -5,13 +5,16 @@ import {
     TouchableOpacity,
     Text,
     StyleSheet,
+    Modal,
+    Button,
 } from 'react-native';
 import { RTCPeerConnection, RTCSessionDescription, mediaDevices, RTCView } from 'react-native-webrtc';
 import io from 'socket.io-client';
 import { RTCIceCandidate } from 'react-native-webrtc';
-
+import { useFocusEffect } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SOCKET_URL, pcConfig } from '../utils/config/config';
+import RatingComponent from '../components/modal/RatingModal'; // Import the RatingComponent
 
 const socket = io(SOCKET_URL);
 
@@ -22,6 +25,7 @@ const CallScreen = ({ route, navigation }) => {
     const [inCall, setInCall] = useState(false);
     const [audioEnabled, setAudioEnabled] = useState(!isAudioOff);
     const [videoEnabled, setVideoEnabled] = useState(!isVideoOff);
+    const [showRating, setShowRating] = useState(false); // State to control rating visibility
 
     const pc = useRef(new RTCPeerConnection(pcConfig));
     const localStreamRef = useRef(null);
@@ -112,6 +116,17 @@ const CallScreen = ({ route, navigation }) => {
         }
     }, [audioEnabled, videoEnabled]);
 
+    useFocusEffect(
+        React.useCallback(() => {
+            return () => {
+                // Cleanup when navigating away
+                if (inCall) {
+                    endCall();
+                }
+            };
+        }, [inCall])
+    );
+
     const startCall = () => {
         socket.emit('join-room', { roomId, username });
         setInCall(true);
@@ -121,6 +136,13 @@ const CallScreen = ({ route, navigation }) => {
         setInCall(false);
         pc.current.close();
         socket.emit('leave-room', roomId);
+        setShowRating(true); // Show rating component after ending the call
+    };
+
+    const handleRating = (rating) => {
+        console.log(`User rated: ${rating}`);
+        setShowRating(false); // Hide rating component after rating
+        navigation.navigate('Home'); // Navigate back to home or another screen
     };
 
     const toggleAudio = () => {
@@ -132,18 +154,15 @@ const CallScreen = ({ route, navigation }) => {
     };
 
     const renderInitialCircle = (nameInitial) => (
-        
         <View style={styles.initialCircle}>
             <Text style={styles.initialText}>{nameInitial}</Text>
         </View>
-       
     );
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.topBar}>
-                <Text style={styles.meetingInfo}>Party ID: {roomId}</Text>
-                <Text style={styles.meetingTime}>12:34</Text>
+                <Text style={styles.meetingInfo}>Lobby ID: {roomId}</Text>
                 <TouchableOpacity style={styles.exitButton} onPress={endCall}>
                     <Ionicons name="exit-outline" size={24} color="#000" />
                 </TouchableOpacity>
@@ -176,6 +195,14 @@ const CallScreen = ({ route, navigation }) => {
                     <Ionicons name="people-outline" size={27} color="#fff" />
                 </TouchableOpacity>
             </View>
+            <Modal
+                transparent={true}
+                animationType="slide"
+                visible={showRating}
+                onRequestClose={() => setShowRating(false)}
+            >
+                <RatingComponent onRate={handleRating} />
+            </Modal>
         </SafeAreaView>
     );
 };
@@ -198,10 +225,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     meetingInfo: {
-        color: '#000',
-        fontSize: 16,
-    },
-    meetingTime: {
         color: '#000',
         fontSize: 16,
     },
@@ -231,12 +254,6 @@ const styles = StyleSheet.create({
     },
     controlButton: {
         padding: 8,
-    },
-    initialContainer:{
-        margin: 90,
-        width: 200,
-        backgroundColor: '#1c1c1c',
-        
     },
     initialCircle: {
         width: 100,
