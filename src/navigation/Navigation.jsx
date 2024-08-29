@@ -31,8 +31,26 @@ export const HomeStack = () => {
       initialRouteName="Home"
     >
       <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="Host" component={HostScreen} />
-      <Stack.Screen name="Join" component={JoinScreen} />
+      <Stack.Screen name="Host" component={HostScreen} options={{
+    title: 'Host',
+    headerStyle: {
+      backgroundColor: '#1E3A8A', 
+    },
+    headerTintColor: '#fff',
+    headerTitleStyle: {
+      fontWeight: 'bold', 
+    },
+  }}/>
+      <Stack.Screen name="Join" component={JoinScreen} options={{
+    title: 'Join',
+    headerStyle: {
+      backgroundColor: '#1E3A8A', 
+    },
+    headerTintColor: '#fff',
+    headerTitleStyle: {
+      fontWeight: 'bold', 
+    },
+  }}/>
       <Stack.Screen
         name="Call"
         component={CallScreen}

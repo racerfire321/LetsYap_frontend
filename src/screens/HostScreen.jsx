@@ -49,10 +49,7 @@ const HostScreen = () => {
         <Switch value={isAudioOff} onValueChange={setIsAudioOff} />
       </View>
 
-      <View style={styles.option}>
-        <Text style={[styles.optionText, { color: currentColors.text }]}>Turn off My Video</Text>
-        <Switch value={isVideoOff} onValueChange={setIsVideoOff} />
-      </View>
+      
 
       <TouchableOpacity style={styles.startButton} onPress={handleStartMeeting}>
         <Icon name="videocam" size={24} color="#fff" />

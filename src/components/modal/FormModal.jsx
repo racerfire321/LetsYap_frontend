@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect,useContext } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,7 +8,8 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-
+import { ThemeContext } from '../../contexts/theme/ThemeProvider';
+import { Colors } from '../../constants/constants';
 
 
 const { height } = Dimensions.get('window');
@@ -16,7 +17,8 @@ const { height } = Dimensions.get('window');
 const FormModal = ({ visible, onClose, children, title }) => {
   const slideAnim = useRef(new Animated.Value(height)).current;
   const overlayAnim = useRef(new Animated.Value(0)).current;
-
+  const { isDarkTheme } = useContext(ThemeContext);
+  const currentColors = isDarkTheme ? Colors.dark : Colors.light; 
   useEffect(() => {
     if (visible) {
       Animated.parallel([
@@ -52,7 +54,8 @@ const FormModal = ({ visible, onClose, children, title }) => {
       transparent={true}
       visible={visible}
       animationType="none"
-      onRequestClose={onClose}>
+      onRequestClose={onClose}
+      backgroundColor={currentColors.box}>
       <Animated.View
         style={[
           styles.overlay,
@@ -66,9 +69,10 @@ const FormModal = ({ visible, onClose, children, title }) => {
       <Animated.View
         style={[
           styles.modalContent,
-          { transform: [{ translateY: slideAnim }] },
+          { transform: [{ translateY: slideAnim }],  backgroundColor: currentColors.box },
+         
         ]}>
-        {title && <Text style={styles.title}>{title}</Text>}
+        {title && <Text style={[styles.title, { color: currentColors.secondary }]}>{title}</Text>}
         <View style={styles.content}>
           {children}
         </View>

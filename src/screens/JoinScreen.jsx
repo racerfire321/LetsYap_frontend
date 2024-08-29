@@ -37,7 +37,7 @@ const JoinScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: currentColors.background }]}>
-      <Text style={[styles.title, { color: currentColors.secondary }]}>Join a Session</Text>
+      <Text style={[styles.title, { color: currentColors.primary }]}>Join a Session</Text>
 
       <TextInput
         style={[styles.input, { backgroundColor: currentColors.box, color: currentColors.text }]}
@@ -60,10 +60,7 @@ const JoinScreen = () => {
         <Switch value={isAudioOff} onValueChange={setIsAudioOff} />
       </View>
 
-      <View style={styles.option}>
-        <Text style={[styles.optionText, { color: currentColors.text }]}>Turn off My Video</Text>
-        <Switch value={isVideoOff} onValueChange={setIsVideoOff} />
-      </View>
+      
 
       <TouchableOpacity
         style={[styles.joinButton]}
