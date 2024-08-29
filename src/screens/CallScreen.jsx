@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState,useContext } from 'react';
 import {
     SafeAreaView,
     View,
@@ -6,15 +6,18 @@ import {
     Text,
     StyleSheet,
     Modal,
-    Button,
+    FlatList,  
 } from 'react-native';
-import { RTCPeerConnection, RTCSessionDescription, mediaDevices, RTCView } from 'react-native-webrtc';
+import { Restart } from 'react-native-restart';
+import { RTCPeerConnection, RTCSessionDescription, mediaDevices, RTCView, RTCIceCandidate } from 'react-native-webrtc';
 import io from 'socket.io-client';
-import { RTCIceCandidate } from 'react-native-webrtc';
+import RecordScreen, { RecordingResult } from 'react-native-record-screen';
 import { useFocusEffect } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SOCKET_URL, pcConfig } from '../utils/config/config';
-import RatingComponent from '../components/modal/RatingModal'; // Import the RatingComponent
+import { ThemeContext } from '../contexts/theme/ThemeProvider';
+import { Colors } from '../constants/constants';
+import RatingComponent from '../components/modal/RatingModal';
 
 const socket = io(SOCKET_URL);
 
@@ -25,10 +28,14 @@ const CallScreen = ({ route, navigation }) => {
     const [inCall, setInCall] = useState(false);
     const [audioEnabled, setAudioEnabled] = useState(!isAudioOff);
     const [videoEnabled, setVideoEnabled] = useState(!isVideoOff);
-    const [showRating, setShowRating] = useState(false); // State to control rating visibility
-
+    const [isScreenSharing, setIsScreenSharing] = useState(false);
+    const [showRating, setShowRating] = useState(false);
+    const [participants, setParticipants] = useState([]); 
+    const { isDarkTheme } = useContext(ThemeContext);
     const pc = useRef(new RTCPeerConnection(pcConfig));
     const localStreamRef = useRef(null);
+    const screenStreamRef = useRef(null);
+    const currentColors = isDarkTheme ? Colors.dark : Colors.light;
 
     useEffect(() => {
         startCall();
@@ -37,18 +44,28 @@ const CallScreen = ({ route, navigation }) => {
             alert('Room not found!');
         };
 
-        const handleUserConnected = async ({ userId }) => {
+        const handleUserConnected = async ({ userId, userName }) => {
+            // Add new participant
+            setParticipants(prev => [...prev, { userId, userName }]);
+
             const offer = await pc.current.createOffer();
             await pc.current.setLocalDescription(offer);
             socket.emit('offer', roomId, offer);
         };
 
+        const handleUserDisconnected = ({ userId }) => {
+            // Remove participant who disconnected
+            setParticipants(prev => prev.filter(p => p.userId !== userId));
+        };
+
         socket.on('room-not-found', handleRoomNotFound);
         socket.on('user-connected', handleUserConnected);
+        socket.on('user-disconnected', handleUserDisconnected);
 
         return () => {
             socket.off('room-not-found', handleRoomNotFound);
             socket.off('user-connected', handleUserConnected);
+            socket.off('user-disconnected', handleUserDisconnected);
         };
     }, [roomId]);
 
@@ -90,7 +107,7 @@ const CallScreen = ({ route, navigation }) => {
 
             socket.on('ice-candidate', async (senderId, candidate) => {
                 try {
-                    const iceCandidate = new RTCIceCandidate(candidate); // Ensure RTCIceCandidate is defined
+                    const iceCandidate = new RTCIceCandidate(candidate);
                     await pc.current.addIceCandidate(iceCandidate);
                 } catch (e) {
                     console.error('Error adding received ice candidate', e);
@@ -101,6 +118,9 @@ const CallScreen = ({ route, navigation }) => {
                 pc.current.close();
                 setLocalStream(null);
                 setRemoteStream(null);
+                if (screenStreamRef.current) {
+                    screenStreamRef.current.getTracks().forEach(track => track.stop());
+                }
             };
         }
     }, [inCall]);
@@ -119,7 +139,6 @@ const CallScreen = ({ route, navigation }) => {
     useFocusEffect(
         React.useCallback(() => {
             return () => {
-                // Cleanup when navigating away
                 if (inCall) {
                     endCall();
                 }
@@ -133,17 +152,23 @@ const CallScreen = ({ route, navigation }) => {
     };
 
     const endCall = () => {
-        setInCall(false);
-        pc.current.close();
-        socket.emit('leave-room', roomId);
-        setShowRating(true); // Show rating component after ending the call
-    };
-
-    const handleRating = (rating) => {
-        console.log(`User rated: ${rating}`);
-        setShowRating(false); // Hide rating component after rating
-        navigation.navigate('Home'); // Navigate back to home or another screen
-    };
+                setInCall(false);
+                pc.current.close();
+                socket.emit('leave-room', roomId);
+                
+                setTimeout(() => {
+                    navigation.navigate('Home'); 
+                }, 2500);
+                setShowRating(true)
+            };
+        
+            const handleRating = (rating) => {
+               
+                setShowRating(false); 
+                
+               
+            };
+        
 
     const toggleAudio = () => {
         setAudioEnabled(prevState => !prevState);
@@ -153,19 +178,64 @@ const CallScreen = ({ route, navigation }) => {
         setVideoEnabled(prevState => !prevState);
     };
 
+    const toggleScreenShare = async () => {
+        if (!isScreenSharing) {
+            try {
+                const res = await RecordScreen.startRecording({
+                    mic: false,
+                    bitrate: 1024000,
+                    fps: 24,
+                });
+                if (res === RecordingResult.PermissionError) {
+                    console.error('Permission error');
+                    return;
+                }
+
+                const screenStream = await mediaDevices.getUserMedia({
+                    video: {
+                        mandatory: {
+                            minFrameRate: 24,
+                        },
+                        optional: [],
+                    },
+                });
+                setIsScreenSharing(true);
+                screenStreamRef.current = screenStream;
+                screenStream.getTracks().forEach(track => pc.current.addTrack(track, screenStream));
+            } catch (error) {
+                console.error('Error starting screen recording:', error);
+            }
+        } else {
+            stopScreenShare();
+        }
+    };
+
+    const stopScreenShare = async () => {
+        if (isScreenSharing) {
+            try {
+                await RecordScreen.stopRecording();
+                screenStreamRef.current.getTracks().forEach(track => track.stop());
+                setIsScreenSharing(false);
+            } catch (error) {
+                console.warn('Error stopping screen recording:', error);
+            }
+        }
+    };
+
+  
     const renderInitialCircle = (nameInitial) => (
-        <View style={styles.initialCircle}>
-            <Text style={styles.initialText}>{nameInitial}</Text>
-        </View>
-    );
+                <View style={styles.initialCircle}>
+                    <Text style={styles.initialText}>{nameInitial}</Text>
+                </View>
+            );
+         
+        
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container} backgroundColor={currentColors.background}>
             <View style={styles.topBar}>
                 <Text style={styles.meetingInfo}>Lobby ID: {roomId}</Text>
-                <TouchableOpacity style={styles.exitButton} onPress={endCall}>
-                    <Ionicons name="exit-outline" size={24} color="#000" />
-                </TouchableOpacity>
+               
             </View>
             <View style={styles.videoContainer}>
                 {videoEnabled ? (
@@ -183,16 +253,16 @@ const CallScreen = ({ route, navigation }) => {
             </View>
             <View style={styles.controlBar}>
                 <TouchableOpacity style={styles.controlButton} onPress={toggleAudio}>
-                    <Ionicons name={audioEnabled ? "mic" : "mic-off"} size={27} color="#fff" />
+                    <Ionicons name={audioEnabled ? "mic" : "mic-off"} size={29} color="#fff" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.controlButton} onPress={toggleVideo}>
-                    <Ionicons name={videoEnabled ? "videocam" : "videocam-off"} size={27} color="#fff" />
+                    <Ionicons name={videoEnabled ? "videocam" : "videocam-off"} size={29} color="#fff" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.controlButton}>
-                    <Ionicons name="share-outline" size={27} color="#fff" />
+                <TouchableOpacity style={styles.controlButton} onPress={toggleScreenShare}>
+                    <Ionicons name={isScreenSharing ? "stop-circle" : "play-circle"} size={29} color="#fff" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.controlButton}>
-                    <Ionicons name="people-outline" size={27} color="#fff" />
+                <TouchableOpacity style={styles.controlButton} onPress={endCall}>
+                    <Ionicons name="call" size={29} color="#ff6347" />
                 </TouchableOpacity>
             </View>
             <Modal
@@ -203,6 +273,7 @@ const CallScreen = ({ route, navigation }) => {
             >
                 <RatingComponent onRate={handleRating} />
             </Modal>
+           
         </SafeAreaView>
     );
 };
@@ -210,23 +281,24 @@ const CallScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: Colors.light.background,
     },
     topBar: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 16,
-        backgroundColor: '#d2e0fb',
+        backgroundColor: '#1E3A8A',
         alignItems: 'center',
-        shadowColor: '#000',
+        shadowColor: '#fff',
+        color: '#fff',
         shadowOpacity: 0,
         shadowRadius: 3.8,
         elevation: 5,
         borderRadius: 10,
     },
     meetingInfo: {
-        color: '#000',
-        fontSize: 16,
+        color: '#fff',
+        fontSize: 18,
     },
     exitButton: {
         padding: 8,
@@ -247,10 +319,13 @@ const styles = StyleSheet.create({
     controlBar: {
         flexDirection: 'row',
         justifyContent: 'space-evenly',
-        padding: 16,
+        padding: 5,
         borderRadius: 90,
         backgroundColor: '#1E3A8A',
-        elevation: 5,
+        elevation: 2,
+        bottom:20,
+        left: 19,
+        width: '90%',
     },
     controlButton: {
         padding: 8,
@@ -267,6 +342,22 @@ const styles = StyleSheet.create({
     initialText: {
         fontSize: 40,
         color: '#fff',
+    },
+    participantContainer: {
+        padding: 16,
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
+    },
+    participantName: {
+        fontSize: 18,
+        color: '#000',
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
 });
 

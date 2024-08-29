@@ -26,6 +26,27 @@
 - **User Profiles:** View and edit profile information, including profile picture and username.
 - **Push Notifications:** Receive notifications for user interactions.
 - **Theming:** Support for light and dark themes.
+## Screenshots 
+![Screenshot](src/assets/screenshots/image-1.png)
+![Screenshot](src/assets/screenshots/image-2.png)
+![Screenshot](src/assets/screenshots/image-3.png)
+![Screenshot](src/assets/screenshots/image-4.png)
+![Screenshot](src/assets/screenshots/image-5.png)
+![Screenshot](src/assets/screenshots/image-6.png)
+![Screenshot](src/assets/screenshots/image-7.png)
+![Screenshot](src/assets/screenshots/image-8.png)
+![Screenshot](src/assets/screenshots/image-9.png)
+![Screenshot](src/assets/screenshots/image-10.png)
+![Screenshot](src/assets/screenshots/image-11.png)
+![Screenshot](src/assets/screenshots/image-12.png)
+![Screenshot](src/assets/screenshots/image-13.png)
+![Screenshot](src/assets/screenshots/image-14.png)
+![Screenshot](src/assets/screenshots/image-15.png)
+![Screenshot](src/assets/screenshots/image-16.png)
+
+
+
+
 
 ## Installation
 
