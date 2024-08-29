@@ -13,7 +13,8 @@ const SettingsScreen = () => {
   const { isDarkTheme, toggleTheme } = useContext(ThemeContext);
   const { isNotificationsEnabled, setIsNotificationsEnabled } = useContext(NotificationContext);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
-
+  const [userProfile, setuserProfile] = useState('');
+ 
 
   const [volume, setVolume] = useState(50);
   const { logout, user } = useContext(AuthContext);
@@ -32,6 +33,7 @@ const SettingsScreen = () => {
               const data = doc.data();
               setUserName(data.firstname || 'User');
               setUserEmail(data.email || 'user@example.com');
+              setuserProfile(data.profileImage || 'https://via.placeholder.com/100');
             }
           },
           (error) => {
@@ -70,7 +72,7 @@ const SettingsScreen = () => {
 
       {/* Profile Section */}
       <View style={[styles.profileContainer, { backgroundColor: currentColors.box }]}>
-        <Image source={{ uri: 'https://via.placeholder.com/100' }} style={styles.profileImage} />
+        <Image source={{ uri: userProfile }} style={styles.profileImage} />
         <View style={styles.profileDetails}>
           {isEditing ? (
             <>
@@ -262,3 +264,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
+

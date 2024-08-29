@@ -13,6 +13,7 @@ import MainScreen from '../screens/MainScreen';
 import CallScreen from '../screens/CallScreen';
 import { ThemeContext } from '../contexts/theme/ThemeProvider'; 
 import { Colors } from '../constants/constants'; 
+import ExploreScreen from '../screens/ExploreScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -41,6 +42,7 @@ export const HomeStack = () => {
         }}
       />
       <Stack.Screen name="Calendar" component={CalendarScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Explore" component={ExploreScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 };

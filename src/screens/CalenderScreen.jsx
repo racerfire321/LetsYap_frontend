@@ -1,11 +1,12 @@
 import React, { useContext, useState, useEffect } from 'react'; 
-import { StyleSheet, View, Text, TouchableOpacity, TextInput, Modal, Button, Alert } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, TextInput, Alert, Button } from 'react-native';
 import { Agenda } from 'react-native-calendars';
 import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ThemeContext } from '../contexts/theme/ThemeProvider';
 import { AuthContext } from '../contexts/auth/AuthProvider';
 import { Colors } from '../constants/constants';
+import FormModal from '../components/modal/FormModal';  
 
 const CalendarScreen = () => {
   const [selectedDate, setSelectedDate] = useState('');
@@ -168,28 +169,24 @@ const CalendarScreen = () => {
         <Icon name="add-circle" size={44} color={currentColors.background} />
       </TouchableOpacity>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
+      <FormModal
         visible={modalVisible}
-        onRequestClose={resetModal}
+        onClose={resetModal}
+        title="Add/Edit Event"
       >
-        <View style={[styles.modalView, { backgroundColor: currentColors.background }]}>
-          <Text style={[styles.modalTitle, { color: currentColors.text }]}>Add/Edit Event</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: currentColors.inputBackground, color: currentColors.text }]}
-            placeholder="Event Name"
-            placeholderTextColor={currentColors.textDisabled}
-            value={eventName}
-            onChangeText={setEventName}
-          />
-          <Text style={{ color: currentColors.text }}>Selected Date: {selectedDate}</Text>
-          <View style={styles.modalButtons}>
-            <Button title="Cancel" onPress={resetModal} color={currentColors.secondary} />
-            <Button title="Save" onPress={handleAddEvent} color={currentColors.primary} />
-          </View>
+        <TextInput
+          style={[styles.input, { backgroundColor: currentColors.inputBackground, color: currentColors.text }]}
+          placeholder="Event Name"
+          placeholderTextColor={currentColors.textDisabled}
+          value={eventName}
+          onChangeText={setEventName}
+        />
+        <Text style={{ color: currentColors.text }}>Selected Date: {selectedDate}</Text>
+        <View style={styles.modalButtons}>
+          <Button title="Cancel" onPress={resetModal} color={currentColors.secondary} />
+          <Button title="Save" onPress={handleAddEvent} color={currentColors.primary} />
         </View>
-      </Modal>
+      </FormModal>
     </View>
   );
 };
@@ -214,15 +211,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 10,
     margin: 15,
-    
     elevation: 3,
   },
   item: {
     flex: 1,
     marginRight: 10,
-    // borderRadius: 10,
-    // padding: 10,
-    // elevation: 2,
   },
   itemText: {
     fontSize: 16,
@@ -246,20 +239,6 @@ const styles = StyleSheet.create({
     zIndex: 1,
     borderRadius: 28,
   },
-  modalView: {
-    width: '80%',
-    maxHeight: '60%',
-    padding: 20,
-    borderRadius: 10,
-    elevation: 5,
-    alignSelf: 'center',
-    top: 190,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
   input: {
     width: '100%',
     padding: 10,
@@ -272,7 +251,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    
   },
 });
 
