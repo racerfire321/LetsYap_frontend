@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Switch, TouchableOpacity, ScrollView, Image, TextInput, Alert } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import Slider from '@react-native-community/slider';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import firestore from '@react-native-firebase/firestore';
@@ -8,7 +7,35 @@ import { AuthContext } from '../contexts/auth/AuthProvider';
 import { ThemeContext } from '../contexts/theme/ThemeProvider';
 import { NotificationContext } from '../contexts/notification/NotificationContext';
 import { Colors } from '../constants/constants';
+import { VolumeManager } from 'react-native-volume-manager';
 
+const useVolumeControl = () => {
+  const [volume, setVolume] = useState(0);
+
+  useEffect(() => {
+    const getInitialVolume = async () => {
+      const { volume } = await VolumeManager.getVolume();
+      setVolume(volume);
+    };
+
+    getInitialVolume();
+
+    const volumeListener = VolumeManager.addVolumeListener((result) => {
+      setVolume(result.volume);
+    });
+
+    return () => {
+      volumeListener.remove();
+    };
+  }, []);
+
+  const handleVolumeChange = async (value) => {
+    await VolumeManager.setVolume(value);
+    setVolume(value);
+  };
+
+  return { volume, handleVolumeChange };
+};
 const SettingsScreen = () => {
   const { isDarkTheme, toggleTheme } = useContext(ThemeContext);
   const { isNotificationsEnabled, setIsNotificationsEnabled } = useContext(NotificationContext);
@@ -16,7 +43,8 @@ const SettingsScreen = () => {
   const [userProfile, setuserProfile] = useState('');
  
 
-  const [volume, setVolume] = useState(50);
+   const { volume, handleVolumeChange } = useVolumeControl();
+
   const { logout, user } = useContext(AuthContext);
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
@@ -60,7 +88,16 @@ const SettingsScreen = () => {
       }
     }
   };
+  const handleCall = () => {
+    Linking.openURL('tel:9768432216');
+  };
 
+  const handleEmail = () => {
+    const url = `mailto:${email}`;
+    Linking.openURL(url).catch((err) => console.error('Failed to open email client', err));
+    Linking.openURL('mailto:bitisha2005@gmail.com');
+  };
+ 
   const currentColors = isDarkTheme ? Colors.dark : Colors.light;
 
   return (
@@ -114,9 +151,9 @@ const SettingsScreen = () => {
       </View>
 
       {/* Theme Settings */}
-      <View style={[styles.setting, { backgroundColor: currentColors.box }]}>
-        <Text style={[styles.settingText, { color: currentColors.text }]}>Dark Theme</Text>
-        <Switch
+       <View style={[styles.setting, { backgroundColor: currentColors.box }]}>
+         <Text style={[styles.settingText, { color: currentColors.text }]}>Dark Theme</Text>
+         <Switch
           trackColor={{ false: '#767577', true: currentColors.primary }}
           thumbColor={isDarkTheme ? currentColors.primary : '#f4f3f4'}
           onValueChange={toggleTheme}
@@ -124,44 +161,46 @@ const SettingsScreen = () => {
         />
       </View>
 
-      {/* Language Settings */}
-      <View style={[styles.setting, { backgroundColor: currentColors.box }]}>
-        <Text style={[styles.settingText, { color: currentColors.text }]}>Language</Text>
-        <Picker
-          selectedValue={selectedLanguage}
-          style={[styles.picker, { color: currentColors.text }]}
-          onValueChange={(itemValue) => setSelectedLanguage(itemValue)}
-        >
-          <Picker.Item label="English" value="en" />
-          <Picker.Item label="Spanish" value="es" />
-          <Picker.Item label="French" value="fr" />
-        </Picker>
-      </View>
+     
 
       {/* Volume Settings */}
-      <View style={[styles.setting, { backgroundColor: currentColors.box }]}>
-        <Text style={[styles.settingText, { color: currentColors.text }]}>Volume</Text>
-        <Slider
-          style={styles.slider}
-          minimumValue={0}
-          maximumValue={100}
-          value={volume}
-          onValueChange={(value) => setVolume(value)}
-          minimumTrackTintColor={currentColors.primary}
-          maximumTrackTintColor={currentColors.border}
-          thumbTintColor={currentColors.primary}
-        />
-      </View>
-
-      <View style={[styles.setting, { backgroundColor: currentColors.box }]}>
-        <Text style={[styles.settingText, { color: currentColors.text }]}>Notifications</Text>
-        <Switch
+       <View style={[styles.setting, { backgroundColor: currentColors.box }]}>
+<Text style={[styles.settingText, { color: currentColors.text }]}>Volume</Text>
+<Slider
+  style={styles.slider}
+  minimumValue={0}
+  maximumValue={1}
+  value={volume}
+  onValueChange={handleVolumeChange}
+  minimumTrackTintColor={currentColors.primary}
+  maximumTrackTintColor={currentColors.border}
+  thumbTintColor={currentColors.primary}
+/>
+</View>
+       {/* Notification */}   
+           <View style={[styles.setting, { backgroundColor: currentColors.box }]}>
+         <Text style={[styles.settingText, { color: currentColors.text }]}>Notifications</Text>
+         <Switch
           trackColor={{ false: '#767577', true: currentColors.primary }}
           thumbColor={isNotificationsEnabled ? currentColors.primary : '#f4f3f4'}
           onValueChange={() => setIsNotificationsEnabled((prev) => !prev)}
           value={isNotificationsEnabled}
         />
       </View>
+       
+      {/* Contact Us Section */}
+      <View style={[styles.contactContainer, { backgroundColor: currentColors.box }]}>
+        <Text style={[styles.settingText, { color: currentColors.text }]}>Contact Us</Text>
+        <View style={styles.contactIcons}>
+          <TouchableOpacity onPress={handleCall} style={styles.contactIcon}>
+            <Ionicons name="call" size={24} color={currentColors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleEmail} style={styles.contactIcon}>
+            <Ionicons name="mail" size={24} color={currentColors.primary} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
 
       {/* Logout Button */}
       <TouchableOpacity style={[styles.logoutButton, { backgroundColor: currentColors.button }]} onPress={logout}>
@@ -170,7 +209,7 @@ const SettingsScreen = () => {
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={[styles.footerText, { color: currentColors.footerText }]}>© 2024 YourApp. All rights reserved.</Text>
+        <Text style={[styles.footerText, { color: currentColors.footerText }]}>© 2024 Let's Yap. All rights reserved.</Text>
       </View>
     </ScrollView>
   );
@@ -244,6 +283,26 @@ const styles = StyleSheet.create({
   slider: {
     width: 150,
     height: 40,
+  },
+  contactContainer: {
+    padding: 15,
+    borderRadius: 10,
+    backgroundColor: '#f9f9f9',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 25,
+    padding: 15,
+    borderRadius: 10,
+    elevation: 4,
+
+  },
+  contactIcons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+   
+  },
+  contactIcon: {
+    paddingHorizontal: 12,
   },
   logoutButton: {
     padding: 15,
