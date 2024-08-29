@@ -209,7 +209,7 @@ const SettingsScreen = () => {
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={[styles.footerText, { color: currentColors.footerText }]}>© 2024 YourApp. All rights reserved.</Text>
+        <Text style={[styles.footerText, { color: currentColors.footerText }]}>© 2024 Let's Yap. All rights reserved.</Text>
       </View>
     </ScrollView>
   );
