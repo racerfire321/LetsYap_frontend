@@ -69,7 +69,7 @@ const OnboardingScreen = ({ navigation }) => {
   }, [currentIndex]);
 
   const handleDone = () => {
-    navigation.navigate('LoginScreen');
+    navigation.navigate('Login');
   };
 
   return (

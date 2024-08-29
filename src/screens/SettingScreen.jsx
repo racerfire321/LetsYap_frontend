@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Switch, TouchableOpacity, ScrollView, Image, TextInput, Alert } from 'react-native';
+import { StyleSheet, Text, View, Switch, TouchableOpacity,Linking, ScrollView, Image, TextInput, Alert } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import firestore from '@react-native-firebase/firestore';

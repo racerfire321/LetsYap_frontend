@@ -71,9 +71,10 @@ const RatingComponent = ({ onRate, onClose }) => {
   };
 
   const handleConfirm = () => {
-    onRate(rating);
+    
     setModalVisible(false);
-    onClose(); // Notify parent to close modal
+    
+   
   };
 
   return (
