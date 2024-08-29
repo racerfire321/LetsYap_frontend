@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Switch, TouchableOpacity, ScrollView, Image, TextInput, Alert } from 'react-native';
+import { StyleSheet, Text, View, Switch, TouchableOpacity, ScrollView,Linking, Image, TextInput, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Slider from '@react-native-community/slider';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -59,6 +59,15 @@ const SettingsScreen = () => {
         Alert.alert('Error', 'Failed to update profile. Please try again.');
       }
     }
+  };
+  const handleCall = () => {
+    Linking.openURL('tel:9768432216');
+  };
+
+  const handleEmail = () => {
+    const url = `mailto:bitisha2005@gmail.com`;
+    Linking.openURL(url).catch((err) => console.error('Failed to open email client', err));
+   
   };
 
   const currentColors = isDarkTheme ? Colors.dark : Colors.light;
@@ -124,19 +133,7 @@ const SettingsScreen = () => {
         />
       </View>
 
-      {/* Language Settings */}
-      <View style={[styles.setting, { backgroundColor: currentColors.box }]}>
-        <Text style={[styles.settingText, { color: currentColors.text }]}>Language</Text>
-        <Picker
-          selectedValue={selectedLanguage}
-          style={[styles.picker, { color: currentColors.text }]}
-          onValueChange={(itemValue) => setSelectedLanguage(itemValue)}
-        >
-          <Picker.Item label="English" value="en" />
-          <Picker.Item label="Spanish" value="es" />
-          <Picker.Item label="French" value="fr" />
-        </Picker>
-      </View>
+     
 
       {/* Volume Settings */}
       <View style={[styles.setting, { backgroundColor: currentColors.box }]}>
@@ -152,7 +149,7 @@ const SettingsScreen = () => {
           thumbTintColor={currentColors.primary}
         />
       </View>
-
+       {/* Notification */}
       <View style={[styles.setting, { backgroundColor: currentColors.box }]}>
         <Text style={[styles.settingText, { color: currentColors.text }]}>Notifications</Text>
         <Switch
@@ -162,6 +159,20 @@ const SettingsScreen = () => {
           value={isNotificationsEnabled}
         />
       </View>
+       
+      {/* Contact Us Section */}
+      <View style={[styles.contactContainer, { backgroundColor: currentColors.box }]}>
+        <Text style={[styles.settingText, { color: currentColors.text }]}>Contact Us</Text>
+        <View style={styles.contactIcons}>
+          <TouchableOpacity onPress={handleCall} style={styles.contactIcon}>
+            <Ionicons name="call" size={24} color={currentColors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleEmail} style={styles.contactIcon}>
+            <Ionicons name="mail" size={24} color={currentColors.primary} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
 
       {/* Logout Button */}
       <TouchableOpacity style={[styles.logoutButton, { backgroundColor: currentColors.button }]} onPress={logout}>
@@ -244,6 +255,26 @@ const styles = StyleSheet.create({
   slider: {
     width: 150,
     height: 40,
+  },
+  contactContainer: {
+    padding: 15,
+    borderRadius: 10,
+    backgroundColor: '#f9f9f9',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 25,
+    padding: 15,
+    borderRadius: 10,
+    elevation: 4,
+
+  },
+  contactIcons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+   
+  },
+  contactIcon: {
+    paddingHorizontal: 12,
   },
   logoutButton: {
     padding: 15,
