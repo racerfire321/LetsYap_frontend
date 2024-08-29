@@ -95,7 +95,7 @@ export const AppNavigator = () => {
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
 
-            if (route.name === 'Home') {
+            if (route.name === 'HomeMain') {
               iconName = focused ? 'home' : 'home-outline';
             } else if (route.name === 'Settings') {
               iconName = focused ? 'settings' : 'settings-outline';
@@ -110,7 +110,7 @@ export const AppNavigator = () => {
           tabBarInactiveTintColor: currentColors.navText,
         })}
       >
-        <Tab.Screen name="Home" component={HomeStack} options={{ headerShown: false }} />
+        <Tab.Screen name="HomeMain" component={HomeStack} options={{ headerShown: false }} />
         <Tab.Screen name="Settings" component={SettingsScreen} options={{ headerShown: false }} />
       </Tab.Navigator>
    

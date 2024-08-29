@@ -58,7 +58,7 @@ const RegisterScreen = ({ navigation }) => {
     try {
       await register(firstName, lastName, dob, email, password);
       console.log('User registered successfully!');
-      navigation.navigate('Login'); // Navigate to another screen or perform other actions
+      navigation.navigate('Login'); 
     } catch (error) {
       console.error('Registration error:', error);
       setAlertTitle('Registration Error');
