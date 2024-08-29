@@ -117,9 +117,12 @@ const CalendarScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: currentColors.background }]}>
-      <Text style={[styles.header, { backgroundColor: currentColors.primary }]}>
+      <Text style={styles.header}>
         Your Schedule
       </Text>
+      <TouchableOpacity style={[styles.addButton, { backgroundColor: currentColors.primary }]} onPress={() => setModalVisible(true)}>
+        <Icon name="add-circle" size={44} color={currentColors.background} />
+      </TouchableOpacity>
       <Agenda
         items={items}
         selected={selectedDate}
@@ -165,9 +168,7 @@ const CalendarScreen = () => {
         }}
       />
 
-      <TouchableOpacity style={[styles.addButton, { backgroundColor: currentColors.primary }]} onPress={() => setModalVisible(true)}>
-        <Icon name="add-circle" size={44} color={currentColors.background} />
-      </TouchableOpacity>
+      
 
       <FormModal
         visible={modalVisible}
@@ -201,6 +202,7 @@ const styles = StyleSheet.create({
     padding: 16,
     textAlign: 'center',
     color: 'white',
+    backgroundColor: Colors.light.primary,
     elevation: 3,
   },
   itemContainer: {
