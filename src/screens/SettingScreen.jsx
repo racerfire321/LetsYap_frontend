@@ -5,6 +5,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import firestore from '@react-native-firebase/firestore';
 import { AuthContext } from '../contexts/auth/AuthProvider';
 import { ThemeContext } from '../contexts/theme/ThemeProvider';
+import storage from '@react-native-firebase/storage';
+import { launchImageLibrary } from 'react-native-image-picker';
 import { NotificationContext } from '../contexts/notification/NotificationContext';
 import { Colors } from '../constants/constants';
 import { VolumeManager } from 'react-native-volume-manager';
@@ -41,10 +43,7 @@ const SettingsScreen = () => {
   const { isNotificationsEnabled, setIsNotificationsEnabled } = useContext(NotificationContext);
   const [selectedLanguage, setSelectedLanguage] = useState('en');
   const [userProfile, setuserProfile] = useState('');
- 
-
    const { volume, handleVolumeChange } = useVolumeControl();
-
   const { logout, user } = useContext(AuthContext);
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
@@ -79,6 +78,7 @@ const SettingsScreen = () => {
         await firestore().collection('users').doc(user.uid).update({
           firstname: userName,
           email: userEmail,
+          profileImage: userProfile,
         });
         Alert.alert('Success', 'Profile updated successfully!');
         setIsEditing(false);
@@ -91,7 +91,21 @@ const SettingsScreen = () => {
   const handleCall = () => {
     Linking.openURL('tel:9768432216');
   };
-
+  const handleSelectImage = async () => {
+    launchImageLibrary({ mediaType: 'photo' }, async (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.errorCode) {
+        console.log('ImagePicker Error: ', response.errorCode);
+      } else {
+        const { uri } = response.assets[0];
+        const reference = storage().ref(`profile_images/${user.uid}`);
+        await reference.putFile(uri);
+        const url = await reference.getDownloadURL();
+        setuserProfile(url);  
+      }
+    });
+  };
   const handleEmail = () => {
     const url = `mailto:${email}`;
     Linking.openURL(url).catch((err) => console.error('Failed to open email client', err));
@@ -109,7 +123,9 @@ const SettingsScreen = () => {
 
       {/* Profile Section */}
       <View style={[styles.profileContainer, { backgroundColor: currentColors.box }]}>
-        <Image source={{ uri: userProfile }} style={styles.profileImage} />
+        <TouchableOpacity onPress={handleSelectImage}>
+          <Image source={{ uri: userProfile }} style={styles.profileImage} />
+        </TouchableOpacity>
         <View style={styles.profileDetails}>
           {isEditing ? (
             <>
@@ -149,6 +165,7 @@ const SettingsScreen = () => {
           <Ionicons name={isEditing ? "checkmark" : "pencil"} size={24} color={currentColors.text} />
         </TouchableOpacity>
       </View>
+
 
       {/* Theme Settings */}
        <View style={[styles.setting, { backgroundColor: currentColors.box }]}>

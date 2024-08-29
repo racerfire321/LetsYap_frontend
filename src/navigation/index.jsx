@@ -1,24 +1,41 @@
-import React, {useContext, useState, useEffect} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import React, { useContext, useState, useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
-import {AuthContext} from '../contexts/auth/AuthProvider';
+import { AuthContext } from '../contexts/auth/AuthProvider';
 import { AuthStack, AppNavigator } from './Navigation';
+import SplashScreen from '../screens/SplashScreen'; 
 
 const Routes = () => {
-  const {user, setUser} = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const [initializing, setInitializing] = useState(true);
+  const [showSplash, setShowSplash] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
 
   const onAuthStateChanged = (user) => {
     setUser(user);
-    if (initializing) setInitializing(false);
+    if (initializing) {
+      setInitializing(false);
+      setAuthChecked(true);
+    }
   };
 
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber; // unsubscribe on unmount
+
+    // Hide splash screen after 1 second or when authentication state changes
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 1700); 
+
+    return () => {
+      clearTimeout(timer);
+      subscriber(); 
+    };
   }, []);
 
-  if (initializing) return null;
+  if (!authChecked) return null;
+
+  if (initializing || showSplash) return <SplashScreen />;
 
   return (
     <NavigationContainer>
@@ -28,3 +45,5 @@ const Routes = () => {
 };
 
 export default Routes;
+
+
