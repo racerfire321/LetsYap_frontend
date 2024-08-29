@@ -1,17 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, Linking, TextInput, Alert, Modal, Button } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  FlatList,
+  TouchableOpacity,
+  Linking,
+  TextInput,Button,
+  Alert,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth'; 
+import auth from '@react-native-firebase/auth';
+import FormModal from '../modal/FormModal'; 
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
   const [newUserFirstname, setNewUserFirstname] = useState('');
   const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserProfile, setNewUserProfile] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
 
-  // Get the current user's ID from Firebase Authentication
+ 
   const currentUserId = auth().currentUser?.uid;
 
   useEffect(() => {
@@ -27,8 +39,9 @@ const UserList = () => {
           id: doc.id,
           firstname: doc.data().firstname,
           email: doc.data().email,
+          profileImage: doc.data().profileImage,
         }));
-        setAllUsers(usersList); // Store all users
+        setAllUsers(usersList); 
       });
 
     const unsubscribeCurrentUserFriends = firestore()
@@ -72,7 +85,7 @@ const UserList = () => {
       const userDoc = userSnapshot.docs[0];
       const userId = userDoc.id;
 
-      // Ensure current user ID is defined
+    
       if (!currentUserId) {
         Alert.alert('Error', 'Failed to get current user ID.');
         return;
@@ -84,7 +97,7 @@ const UserList = () => {
         friends: firestore.FieldValue.arrayUnion(userId),
       }, { merge: true });
 
-      // Update the new friend's friends list
+     
       const userFriendsRef = firestore().collection('userFriends').doc(userId);
       await userFriendsRef.set({
         friends: firestore.FieldValue.arrayUnion(currentUserId),
@@ -115,7 +128,7 @@ const UserList = () => {
         renderItem={({ item }) => (
           <View style={styles.userRow}>
             <Image
-              source={require('../../assets/user/bits.jpg')}
+              source={{ uri: item.profileImage }}
               style={styles.userImage}
             />
             <Text style={styles.userName}>{item.firstname}</Text>
@@ -125,33 +138,29 @@ const UserList = () => {
           </View>
         )}
       />
-      <Modal
+      <FormModal
         visible={modalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setModalVisible(false)}
+        onClose={() => setModalVisible(false)}
+        title="Add New User"
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TextInput
-              style={styles.input}
-              placeholder="First Name"
-              value={newUserFirstname}
-              onChangeText={setNewUserFirstname}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              value={newUserEmail}
-              onChangeText={setNewUserEmail}
-            />
-            <View style={styles.modalButtons}>
-              <Button title="Add User" onPress={handleAddUser} />
-              <Button title="Cancel" onPress={() => setModalVisible(false)} />
-            </View>
-          </View>
+        <TextInput
+          style={styles.input}
+          placeholder="First Name"
+          value={newUserFirstname}
+          onChangeText={setNewUserFirstname}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={newUserEmail}
+          onChangeText={setNewUserEmail}
+        />
+        <View style={styles.modalButtons}>
+         
+          <Button title="Cancel"  color={'#ff6347'}onPress={() => setModalVisible(false)} />
+          <Button title="Add User" color={'#1E3A8A'} onPress={handleAddUser} />
         </View>
-      </Modal>
+      </FormModal>
     </View>
   );
 };
@@ -196,25 +205,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF6F61',
     padding: 8,
     borderRadius: 50,
-    bottom: 10,
+    bottom: 5,
   },
   addButtonText: {
     color: '#fff',
     marginLeft: 10,
     fontSize: 14,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContent: {
-    width: '80%',
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    alignItems: 'center',
   },
   input: {
     height: 40,
@@ -229,6 +225,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+    color:'#ff6347'
   },
 });
 
