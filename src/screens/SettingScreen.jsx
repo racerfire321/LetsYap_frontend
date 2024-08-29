@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Switch, TouchableOpacity, ScrollView,Linking, Image, TextInput, Alert } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { StyleSheet, Text, View, Switch, TouchableOpacity, ScrollView, Image, TextInput, Alert } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import firestore from '@react-native-firebase/firestore';
@@ -8,7 +7,35 @@ import { AuthContext } from '../contexts/auth/AuthProvider';
 import { ThemeContext } from '../contexts/theme/ThemeProvider';
 import { NotificationContext } from '../contexts/notification/NotificationContext';
 import { Colors } from '../constants/constants';
+import { VolumeManager } from 'react-native-volume-manager';
 
+const useVolumeControl = () => {
+  const [volume, setVolume] = useState(0);
+
+  useEffect(() => {
+    const getInitialVolume = async () => {
+      const { volume } = await VolumeManager.getVolume();
+      setVolume(volume);
+    };
+
+    getInitialVolume();
+
+    const volumeListener = VolumeManager.addVolumeListener((result) => {
+      setVolume(result.volume);
+    });
+
+    return () => {
+      volumeListener.remove();
+    };
+  }, []);
+
+  const handleVolumeChange = async (value) => {
+    await VolumeManager.setVolume(value);
+    setVolume(value);
+  };
+
+  return { volume, handleVolumeChange };
+};
 const SettingsScreen = () => {
   const { isDarkTheme, toggleTheme } = useContext(ThemeContext);
   const { isNotificationsEnabled, setIsNotificationsEnabled } = useContext(NotificationContext);
@@ -16,7 +43,8 @@ const SettingsScreen = () => {
   const [userProfile, setuserProfile] = useState('');
  
 
-  const [volume, setVolume] = useState(50);
+   const { volume, handleVolumeChange } = useVolumeControl();
+
   const { logout, user } = useContext(AuthContext);
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
@@ -65,11 +93,11 @@ const SettingsScreen = () => {
   };
 
   const handleEmail = () => {
-    const url = `mailto:bitisha2005@gmail.com`;
+    const url = `mailto:${email}`;
     Linking.openURL(url).catch((err) => console.error('Failed to open email client', err));
-   
+    Linking.openURL('mailto:bitisha2005@gmail.com');
   };
-
+ 
   const currentColors = isDarkTheme ? Colors.dark : Colors.light;
 
   return (
@@ -123,9 +151,9 @@ const SettingsScreen = () => {
       </View>
 
       {/* Theme Settings */}
-      <View style={[styles.setting, { backgroundColor: currentColors.box }]}>
-        <Text style={[styles.settingText, { color: currentColors.text }]}>Dark Theme</Text>
-        <Switch
+       <View style={[styles.setting, { backgroundColor: currentColors.box }]}>
+         <Text style={[styles.settingText, { color: currentColors.text }]}>Dark Theme</Text>
+         <Switch
           trackColor={{ false: '#767577', true: currentColors.primary }}
           thumbColor={isDarkTheme ? currentColors.primary : '#f4f3f4'}
           onValueChange={toggleTheme}
@@ -136,23 +164,23 @@ const SettingsScreen = () => {
      
 
       {/* Volume Settings */}
-      <View style={[styles.setting, { backgroundColor: currentColors.box }]}>
-        <Text style={[styles.settingText, { color: currentColors.text }]}>Volume</Text>
-        <Slider
-          style={styles.slider}
-          minimumValue={0}
-          maximumValue={100}
-          value={volume}
-          onValueChange={(value) => setVolume(value)}
-          minimumTrackTintColor={currentColors.primary}
-          maximumTrackTintColor={currentColors.border}
-          thumbTintColor={currentColors.primary}
-        />
-      </View>
-       {/* Notification */}
-      <View style={[styles.setting, { backgroundColor: currentColors.box }]}>
-        <Text style={[styles.settingText, { color: currentColors.text }]}>Notifications</Text>
-        <Switch
+       <View style={[styles.setting, { backgroundColor: currentColors.box }]}>
+<Text style={[styles.settingText, { color: currentColors.text }]}>Volume</Text>
+<Slider
+  style={styles.slider}
+  minimumValue={0}
+  maximumValue={1}
+  value={volume}
+  onValueChange={handleVolumeChange}
+  minimumTrackTintColor={currentColors.primary}
+  maximumTrackTintColor={currentColors.border}
+  thumbTintColor={currentColors.primary}
+/>
+</View>
+       {/* Notification */}   
+           <View style={[styles.setting, { backgroundColor: currentColors.box }]}>
+         <Text style={[styles.settingText, { color: currentColors.text }]}>Notifications</Text>
+         <Switch
           trackColor={{ false: '#767577', true: currentColors.primary }}
           thumbColor={isNotificationsEnabled ? currentColors.primary : '#f4f3f4'}
           onValueChange={() => setIsNotificationsEnabled((prev) => !prev)}
