@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import {
   StyleSheet,
   Text,
@@ -14,6 +14,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import FormModal from '../modal/FormModal'; 
+import { Colors } from '../../constants/constants';
+import { ThemeContext } from '../../contexts/theme/ThemeProvider';
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -22,7 +24,8 @@ const UserList = () => {
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserProfile, setNewUserProfile] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-
+  const { isDarkTheme } = useContext(ThemeContext);
+  const currentColors = isDarkTheme ? Colors.dark : Colors.light; 
  
   const currentUserId = auth().currentUser?.uid;
 
@@ -131,7 +134,7 @@ const UserList = () => {
               source={{ uri: item.profileImage }}
               style={styles.userImage}
             />
-            <Text style={styles.userName}>{item.firstname}</Text>
+            <Text style={[styles.userName, { color: currentColors.text }]}>{item.firstname}</Text>
             <TouchableOpacity onPress={() => sendEmail(item.email)}>
               <Icon name="mail-outline" size={24} color="#FF6F61" />
             </TouchableOpacity>
@@ -144,14 +147,16 @@ const UserList = () => {
         title="Add New User"
       >
         <TextInput
-          style={styles.input}
+         style={[styles.input, { color: currentColors.text, borderColor: currentColors.border }]}
           placeholder="First Name"
+          placeholderTextColor='#999'
           value={newUserFirstname}
           onChangeText={setNewUserFirstname}
         />
         <TextInput
-          style={styles.input}
+           style={[styles.input, { color: currentColors.text, borderColor: currentColors.border }]}
           placeholder="Email"
+          placeholderTextColor='#999' 
           value={newUserEmail}
           onChangeText={setNewUserEmail}
         />

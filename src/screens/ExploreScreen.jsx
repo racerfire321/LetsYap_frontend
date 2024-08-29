@@ -19,6 +19,8 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AuthContext } from '../contexts/auth/AuthProvider';
 import { uploadImage } from '../services/ImageService'; 
+import { ThemeContext } from '../contexts/theme/ThemeProvider'; 
+import { Colors } from '../constants/constants';
 
 const { height } = Dimensions.get('window');
 
@@ -31,7 +33,8 @@ const ExploreScreen = ({ navigation }) => {
     const [roomTitle, setRoomTitle] = useState('');
     const [roomDescription, setRoomDescription] = useState('');
     const [roomImage, setRoomImage] = useState(null);
-     
+    const { isDarkTheme } = useContext(ThemeContext);
+    const currentColors = isDarkTheme ? Colors.dark : Colors.light; 
     const slideAnim = useRef(new Animated.Value(height)).current;
     const overlayAnim = useRef(new Animated.Value(0)).current;
     const { user } = useContext(AuthContext);
@@ -170,7 +173,7 @@ const ExploreScreen = ({ navigation }) => {
         <View style={{ flex: 1,backgroundColor:'##1E3A8A' }}>
         <View style={styles.Container}>
         <Text style={[styles.header]}>
-        Explore Worlds
+        Explore World
       </Text>
            
             <TouchableOpacity
@@ -186,6 +189,7 @@ const ExploreScreen = ({ navigation }) => {
 transparent={true}
 visible={showCreateRoomModal}
 animationType="none"
+
 onRequestClose={() => setShowCreateRoomModal(false)}
 >
 <Animated.View
@@ -196,7 +200,7 @@ onRequestClose={() => setShowCreateRoomModal(false)}
         },
     ]}
 >
-    <TouchableOpacity style={{ flex: 1 }} onPress={() => setShowCreateRoomModal(false)} />
+    <TouchableOpacity style={[{ flex: 1 }]} onPress={() => setShowCreateRoomModal(false)} />
 </Animated.View>
 
 <Animated.View
@@ -204,21 +208,23 @@ onRequestClose={() => setShowCreateRoomModal(false)}
         styles.modalContent,
         { transform: [{ translateY: slideAnim }] },
     ]}
+    backgroundColor={currentColors.box}
 >
-    <Text style={styles.modalTitle}>Create New Room</Text>
+    <Text style={[styles.modalTitle, { color: currentColors.secondary }]} >Create New Room</Text>
 
     <Text style={styles.label}>Room Title</Text>
     <TextInput
-        style={styles.input}
+       style={[styles.input, { color: currentColors.text, borderColor: currentColors.border, backgroundColor: currentColors.inputBackground }]}
         value={roomTitle}
         onChangeText={setRoomTitle}
         placeholder="Enter room title"
         placeholderTextColor="#999"
+        
     />
 
     <Text style={styles.label}>Room Description</Text>
     <TextInput
-        style={[styles.input, styles.textArea]}
+            style={[styles.input, styles.textArea, { color: currentColors.text, borderColor: currentColors.border, backgroundColor: currentColors.inputBackground }]}
         value={roomDescription}
         onChangeText={setRoomDescription}
         placeholder="Enter room description"
@@ -228,7 +234,8 @@ onRequestClose={() => setShowCreateRoomModal(false)}
     />
 
     <TouchableOpacity style={styles.imageButton} onPress={selectImage}>
-        <Text style={styles.imageButtonText}>Select Room Image </Text>
+        <Ionicons name="camera" size={24} color={currentColors.text}/>
+        <Text style={[styles.imageButtonText,, { color: currentColors.text, borderColor: currentColors.border}]}>Select Room Image </Text>
     </TouchableOpacity>
 
     {roomImage && (
@@ -254,14 +261,14 @@ onRequestClose={() => setShowCreateRoomModal(false)}
             <Text style={{ textAlign: 'center', marginTop: 20 }}>No rooms here</Text>
         ) : (
 
-            <View style={styles.MainContainer}>
-            <Text style={styles.label}>Join Rooms</Text>
+            <View style={styles.MainContainer} backgroundColor={currentColors.background}>
+            <Text style={[styles.label, { color: currentColors.text }]}>Join Rooms</Text>
             <FlatList
                 data={rooms}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => joinRoom(item.roomId)}>
-                        <View style={styles.roomContainer}>
+                        <View style={[styles.roomContainer, { backgroundColor: currentColors.box }]}>
                             <View style={styles.roomContent}>
                                 <View style={styles.profileColumn}>
                                     {item.imageUrl && (
@@ -273,10 +280,10 @@ onRequestClose={() => setShowCreateRoomModal(false)}
                                     
                                 </View>
                                 <View style={styles.detailsColumn}>
-                                    <Text style={styles.roomTitle}>{item.title}</Text>
-                                    <Text>{item.description}</Text>
+                                    <Text style={[styles.label, { color: currentColors.navText }]}>{item.title}</Text>
+                                    <Text style={[{fontSize: 14}, { color: currentColors.text }]}>{item.description}</Text>
                                     <View style={styles.footerContainer}>
-                                        <Text style={{ fontSize: 12 }}>Created by: {item.createdBy}</Text>
+                                        <Text style={[ {fontSize: 12},{ color: currentColors.footerText } ]}>Created by: {item.createdBy}</Text>
                                         {item.createdBy === username && (
                                             <TouchableOpacity
                                                 style={styles.deleteButton}
@@ -300,6 +307,10 @@ onRequestClose={() => setShowCreateRoomModal(false)}
 };
 
 const styles = StyleSheet.create({
+    parentContainer:{
+        flex: 1,
+        backgroundColor:'##1E3A8A' 
+    },
 overlay: {
     position: 'absolute',
     top: 0,
@@ -340,6 +351,7 @@ label: {
 },
 MainContainer:{
    padding: 20,
+   height: '100%',
 },
 input: {
     borderWidth: 1,
@@ -355,16 +367,18 @@ textArea: {
     textAlignVertical: 'top',
 },
 imageButton: {
-  
+    flexDirection:'row',
     paddingVertical: 10,
     borderRadius: 8,
-    alignItems: 'center',
+
+   alignContent:'center',
     marginBottom: 15,
 },
 imageButtonText: {
     color: '#000',
     fontSize: 16,
     fontWeight: 'bold',
+    marginLeft: 10
 },
 previewImage: {
     width: 100,
@@ -402,7 +416,7 @@ image: {
     width: 80, 
     height: 80, 
     borderRadius: 8,
-    marginBottom: 15,
+    marginBottom: 10,
 },
 roomContainer: {
     padding: 10,
